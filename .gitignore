@@ -1,0 +1,49 @@
+
+# Environnement virtuel Python
+.venv/
+venv/
+env/
+
+# Fichiers Python temporaires
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Variables d'environnement et secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Tests et couverture
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Données du dataset
+data/raw/
+data/processed/
+
+# Modèles entraînés
+models/
+*.keras
+*.h5
+*.hdf5
+*.weights.h5
+
+# Fichiers temporaires et système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers de sauvegarde
+*.bak
+*.tmp
