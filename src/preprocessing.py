@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -31,7 +32,7 @@ def image_process(image_path, image_size=(150, 150)):
     image_encode = tf.io.read_file(image_path)
     image_decode = tf.io.decode_jpeg(image_encode, channels=3)
     resized_image = tf.image.resize(image_decode, image_size)
-    return resized_image
+    return normaliser_images(resized_image)
 
 def augment_img(img):
     img = flip(img)
@@ -102,7 +103,8 @@ def visualiser_augmentation(nombre=5):
     for i, (chemin, classe, fichier) in enumerate(images):
         image = Image.open(chemin).convert("RGB")
         image = image.resize(SIZE_IMG)
-        image = tf.convert_to_tensor(image, dtype=tf.float32)/255.0
+        image = np.array(image, dtype=np.float32) / 255.0
+        image = tf.convert_to_tensor(image)
         img_aug = augment_img(image)
         plt.subplot(2, nombre, i+1)
         plt.imshow(image.numpy())

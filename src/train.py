@@ -1,4 +1,5 @@
 import tensorflow as tf
+from pathlib import Path
 import matplotlib.pyplot as plt
 from preprocessing import main_preprocessing
 
@@ -10,17 +11,20 @@ def creer_model_cnn(kr_size=(3, 3)):
         tf.keras.layers.MaxPooling2D(),
         tf.keras.layers.Conv2D(64, kernel_size=kr_size, strides=(1, 1), padding='valid', activation='relu'),
         tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Conv2D(128, kernel_size=kr_size, strides=(1,1), padding='valid', activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.GlobalAveragePooling2D(),
         tf.keras.layers.Dropout(0.3),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
     return model
 
 def creer_callbacks():
-    early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True)
+    dossier = Path(__file__).resolve().parent.parent / "models"
+    dossier.mkdir(parents=True, exist_ok=True)
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=6, restore_best_weights=True)
     lr_reduce = tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", patience=2, factor=0.2, min_delta=0.001, min_lr=1e-6, mode='auto')
-    checkpoint = tf.keras.callbacks.ModelCheckpoint("../models/final_model.keras", monitor="val_loss", save_best_only=True)
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(dossier / "final_model.keras", monitor="val_loss", save_best_only=True)
     return [early_stopping, lr_reduce, checkpoint]
 
 def compiler_model(model):
@@ -58,8 +62,14 @@ def visualiser_historique(history):
     plt.show()
 
 def sauvegarder_model(model):
-    model.save("../models/final_model.keras")
-    print("Modele sauvegarde avec succes")
+    dossier = Path(__file__).resolve().parent.parent / "models"
+    dossier.mkdir(parents=True, exist_ok=True)
+    chemin = dossier / "final_model.keras"
+    model.save(chemin)
+    if chemin.exists():
+        print(f"Modele sauvegarde ici: {chemin}")
+    else:
+        print("Erreur: le modele n'a pas ete sauvegarde")
 
 def main_train():
     train_ds, validation_ds, test_ds, class_to_index = main_preprocessing()
